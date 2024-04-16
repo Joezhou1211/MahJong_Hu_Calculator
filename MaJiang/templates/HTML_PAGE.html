@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>麻将胡牌计算器</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 2.5vw; /* 使用视口宽度单位 */
+            text-align: center;
+            background-image: url('/static/bg.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        form {
+            font-size: 10px;
+            background-color: rgba(120, 150, 200, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            opacity: 1;
+        }
+        #result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+
+        }
+        .mahjong-tile-upper {
+            margin: 2px;
+            display: inline-block;
+            width: auto;
+            height: 10vw;   /* 使用视口宽度单位，根据屏幕大小自动调整图片高度 */
+            vertical-align: middle;
+            max-height: 50px; /* 设置最大高度以避免在大屏幕上图片过大 */
+        }
+
+        .mahjong-tile-middle {
+            margin: 2px;
+            width: auto;
+            height: 9vw;   /* 使用视口宽度单位，根据屏幕大小自动调整图片高度 */
+            vertical-align: middle;
+            max-height: 50px; /* 设置最大高度以避免在大屏幕上图片过大 */
+        }
+
+        .mahjong-tile {
+            margin: 1.5px;
+            display: inline-block;
+            width: auto;
+            height: 8vw;   /* 使用视口宽度单位，根据屏幕大小自动调整图片高度 */
+            vertical-align: middle;
+            max-height: 50px; /* 设置最大高度以避免在大屏幕上图片过大 */
+        }
+
+        /* 文本样式 */
+        #result div, form {
+            font-size: 3vw;  /* 使用视口宽度单位，根据屏幕大小自动调整字体大小 */
+            line-height: normal; /* 可根据需要调整 */
+            vertical-align: middle;
+            margin-bottom: 4px;
+            max-font-size: 8px; /* 设置最大字体大小以避免在大屏幕上字体过大 */
+        }
+
+        body::after {
+            content: "版权所有 © 蕉蕉🇨🇳🇦🇺 [抖音号76824851] 禁止商用，侵权必究";
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            color: #000;
+            opacity: 0.5;
+            font-size: 6px;
+            z-index: 9999;
+        }
+        .highlight {
+            color: red;
+            font-weight: bold;
+        }
+        @media (min-width: 768px) {
+            .mahjong-tile, #result div, form, input[type="text"], input[type="button"] {
+                font-size: 10px;
+                height: 50px;
+            }
+        }
+        #tiles div {
+            margin-bottom: 10px;
+        }
+        #handCounter {
+            font-size: 3vw;
+            margin-bottom: 0px;
+            margin-top: 0px;
+            font-weight: bold;
+            color: #007bff;
+
+        }
+        .highlight-box-mid {
+            border: 5px solid #EEECD1; /* 边框 */
+            background-color: #ECD1EE; /* 背景 */
+            padding: 10px; /* 内边距，确保内容与边框有一定距离 */
+            margin: 10px; /* 外边距，确保容器与其他元素有一定距离 */
+            display: inline-block; /* 使容器根据内容调整宽度 */
+            min-width: 300px; /* 设置最小宽度以避免内容过窄 */
+            min-height: auto; /* 设置最小高度以避免内容过短 */
+        }
+        .highlight-box-top {
+            border: 5px solid #EEECD1; /* 边框 */
+            background-color: #EEECD1; /* 背景 */
+            padding: 10px; /* 内边距，确保内容与边框有一定距离 */
+            margin: 10px; /* 外边距，确保容器与其他元素有一定距离 */
+            display: inline-block; /* 使容器根据内容调整宽度 */
+            min-width: 300px; /* 设置最小宽度以避免内容过窄 */
+            min-height: auto; /* 设置最小高度以避免内容过短 */
+        }
+        .highlight-box-down {
+            border: 4px solid #EEECD1; /* 边框 */
+            background-color: #D1EEEC; /* 背景 */
+            display: inline-block; /* 使容器根据内容调整宽度 */
+        }
+        .hand-count {
+            color: #FF4500; /* 橙红色 */
+            font-size: 1.2em; /* 较大字体 */
+        }
+
+        .remove-text {
+            color: #008000; /* 绿色 */
+            font-size: 0.8em; /* 较小字体 */
+        }
+        #huResultsContainer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+
+
+        /* 动态开关 */
+        .switch-box {
+            width: 100px;
+            height: 60px;
+            background-color: rgb(230, 230, 230);
+            position: relative;
+            cursor: pointer;
+            /* 外观 */
+            appearance: none;
+            border-radius: 30px;
+            transition: all 500ms;
+            transform: scale(0.5); /* 缩小 */
+        }
+
+        .switch-box ::before {
+            width: 100px;
+            height: 60px;
+            background-color: rgb(230, 230, 230);
+            position: absolute;
+            cursor: pointer;
+            content: '';
+            border-radius: 30px;
+            transition: all 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        .switch-box::after {
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: 52px;
+            height: 52px;
+            border-radius: 26px;
+            background-color: #fff;
+            box-shadow: 1px 1px 5px rgba(#000, .3);
+            content: '';
+            transition: all 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
+
+        }
+
+        .switch-box:checked {
+            background-color: darkcyan;
+        }
+
+        .switch-box:checked::after {
+            transform: translateX(40px);
+
+        }
+
+        .switch-box:checked::before {
+            transform: scale(0);
+        }
+        #possibleHuResults {
+            color: red; /* 设置字体颜色 */
+            font-size: 1.5em; /* 设置字体大小 */
+        }
+        #noTilesMessage {
+            font-size: 1.2em; /* 根据需要调整字体大小 */
+            color: black; /* 设置字体颜色 */
+            margin-top: 10px; /* 上外边距 */
+            font-weight: bold; /* 设置粗体 */
+
+        }
+        #header {
+            font-size: 1.5em; /* 根据需要调整字体大小 */
+            color: black; /* 设置字体颜色 */
+            font-weight: bold; /* 设置粗体 */
+        }
+        #resetButton {
+            position: fixed; /* 使用绝对定位 */
+            top: 23px; /* 距离顶部20像素 */
+            right: 23px; /* 距离右侧20像素 */
+            padding: 8px 16px; /* 内边距 */
+            background-color: #D1EEDA; /* 背景颜色 */
+            color: black; /* 文字颜色 */
+            cursor: pointer; /* 鼠标悬停时显示手形图标 */
+            z-index: 1000; /* 确保按钮位于所有层的顶部 */
+            border-radius: 5px; /* 圆角边框 */
+            border-width: 2.5px; /* 边框宽度 */
+            border-color: #568064; /* 边框颜色 */
+        }
+        #toggleResultsText {
+            font-size: 1em; /* 根据需要调整字体大小 */
+            font-weight: bold; /* 设置粗体 */
+            margin-top: -10px; /* 上外边距 */
+            margin-bottom: -10px; /* 下外边距 */
+            margin-right: -20px;
+        }
+        .current-hu {
+            font-size: 1.2em; /* 调整字体大小 */
+            color: #007bff; /* 字体颜色 */
+            font-weight: bold; /* 字体加粗 */
+        }
+
+        .hu-type {
+            font-size: 0.8em; /* 文字大小 */
+        }
+
+        .score {
+            font-size: 0.8em; /* 文字大小 */
+        }
+
+        .remaining {
+            font-size: 0.8em; /* 文字大小 */
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <button id="resetButton">重置</button>
+    <div class="highlight-box-top">
+        <h2>点击麻将牌添加到手牌</h2>
+        <div id="tiles">
+            <div id="wanTiles"></div>
+            <div id="tiaoTiles"></div>
+            <div id="tongTiles"></div>
+        </div>
+    </div>
+    <div class="highlight-box-mid">
+        <div id="handCounter">
+            当前手牌数量: <span class="hand-count">0</span>
+        </div>
+        <div id="selectedTiles"></div>
+    </div>
+    <div class="highlight-box-down">
+        <div id="huResultsContainer">
+            <div id="noTilesMessage">
+                <div id="header">欢迎使用川麻胡牌计算器</div>
+                <br>
+                1️⃣ 点击任意麻将添加到手牌<br>
+                2️⃣ 点击手牌任意麻将移除<br>
+                3️⃣ 点击按钮查看胡牌明细<br>
+                4️⃣ 胡牌组合/牌型/分数/剩余张数 仅供参考<br>
+                5️⃣ 暂不支持七对/龙七对/清七对胡牌计算<br>
+                6️⃣ 本软件仅供娱乐 不得用于非法用途<br>
+                7️⃣ 任何问题请私信联系 蕉蕉🇨🇳🇦🇺[抖音号76824851]
+            </div>
+            <div id="possibleHuResults"></div>
+            <span id="toggleResultsText" style="display:none;">  展开胡牌明细👉 </span>
+            <input class="switch-box" type="checkbox" style="display:none;">
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+    let isResultsShown = false;
+    let hand = [];
+    const imageCache = {};
+
+    document.addEventListener('dblclick', function(event){
+      event.preventDefault(); // 阻止双击事件的默认行为，即放大
+    }, false);
+
+    document.addEventListener('touchstart', function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault(); // 如果触摸点超过一个，则阻止默认行为
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault(); // 如果触摸点超过一个，则阻止默认行为
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault(); // 如果触摸点超过一个，则阻止默认行为
+      }
+    }, { passive: false });
+
+    function addTile(tile) {
+        const tileCount = hand.filter(t => t === tile).length;
+        if (tileCount < 4 && hand.length < 13) { // 每张牌最多4次，手牌总数最多13张
+            hand.push(tile);
+            updateSelectedTiles();
+            calculateHu();
+        }
+        updateCounter(); // 更新手牌数量统计器
+    }
+
+    function removeTile(tile) {
+        const index = hand.lastIndexOf(tile); // 修改为lastIndexOf以允许删除多个相同的牌
+        if (index > -1) {
+            hand.splice(index, 1);
+            updateSelectedTiles();
+            calculateHu();
+        }
+        updateCounter();
+    }
+
+    function updateCounter() {
+        const noTilesMessageDiv = document.getElementById('noTilesMessage');
+        const handCountSpan = `<span class="hand-count">${hand.length}</span>`;
+
+        document.getElementById('handCounter').innerHTML = `当前手牌数量: ${handCountSpan}`;
+        if (hand.length === 0) {
+            // 如果手牌无牌，显示提示信息
+            noTilesMessageDiv.style.display = 'block';
+        } else {
+            // 如果手牌有牌，隐藏提示信息
+            noTilesMessageDiv.style.display = 'none';
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCounter();
+    }, false);
+
+    function updateSelectedTiles() {
+        const selectedTilesDiv = document.getElementById('selectedTiles');
+        selectedTilesDiv.innerHTML = '';
+        hand.forEach(tile => {
+            const type = tile[0];
+            const num = tile.substring(1);
+            let imgPath;
+            if (type === 'w') {
+                imgPath = `/static/wan/${num}.png`;
+            } else if (type === 'b') {
+                imgPath = `/static/tong/${10 + parseInt(num)}.png`;
+            } else if (type === 't') {
+                imgPath = `/static/tiao/${20 + parseInt(num)}.png`;
+            }
+
+            // 使用缓存图像或加载新图像
+            let imgElement;
+            if (imageCache[imgPath]) {
+                // 使用缓存中的图像
+                imgElement = imageCache[imgPath].cloneNode();
+            } else {
+                // 加载新图像并添加到缓存
+                imgElement = document.createElement('img');
+                imgElement.src = imgPath;
+                imageCache[imgPath] = imgElement.cloneNode();
+            }
+            imgElement.alt = `Tile ${tile}`;
+            imgElement.className = "mahjong-tile-middle";
+            imgElement.onclick = function() { removeTile(tile); };
+            selectedTilesDiv.appendChild(imgElement);
+            updateCounter();
+        });
+    }
+
+    function numberToMahjongTile(number) {
+        let tileType;
+        if (number >= 1 && number <= 9) { // Wan (1-9)
+            tileType = 'wan';
+        } else if (number >= 11 && number <= 19) { // Tong (11-19)
+            tileType = 'tong';
+        } else if (number >= 21 && number <= 29) { // Tiao (21-29)
+            tileType = 'tiao';
+        }
+
+        const imgPath = `/static/${tileType}/${number}.png`; // Use the complete number for file name
+        const imgElement = document.createElement('img');
+        imgElement.src = imgPath;
+        imgElement.alt = `Tile ${tileType}${number}`;
+        imgElement.classList.add('mahjong-tile');
+        return imgElement;
+    }
+
+    function calculateHu() {
+        const handStr = encodeURIComponent(hand.join(' ')); // 正确编码手牌字符串
+        fetch(`/mahjong?hand=${handStr}`)
+        .then(response => response.json())
+        .then(data => {
+            let possibleHuDiv = document.getElementById('possibleHuResults');
+            possibleHuDiv.innerHTML = ''; // 清空之前的结果
+            let resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = ''; // 清空之前的结果
+
+            // 隐藏胡牌明细和开关按钮
+            resultDiv.style.display = 'none';
+            document.querySelector('.switch-box').style.display = 'none';
+            document.getElementById('toggleResultsText').style.display = 'none';
+            document.querySelector('.switch-box').checked = isResultsShown;
+            toggleResultsDisplay(isResultsShown);
+
+
+            if (data.error) {
+                possibleHuDiv.innerText = data.error;
+            } else {
+                if (data.possible_hu.length > 0) {
+                    possibleHuDiv.innerText = '当前听牌: ';
+                    data.possible_hu.forEach(hu => {
+                        possibleHuDiv.appendChild(numberToMahjongTile(hu));
+                    });
+                    document.querySelector('.switch-box').style.display = 'inline';
+                    document.getElementById('toggleResultsText').style.display = 'inline';
+                }
+
+
+                // 处理胡牌明细
+                data.combinations.forEach((combo, index) => {
+                    let combinationDiv = document.createElement('div');
+
+                    combinationDiv.appendChild(numberToMahjongTile(combo['胡牌']));
+                    combinationDiv.innerHTML += ' \u279C ';
+                    combo['将'].forEach(j => {
+                        combinationDiv.appendChild(numberToMahjongTile(j));
+                    });
+                    combo['组合'].forEach(meld => {
+                        meld.forEach(tile => {
+                            combinationDiv.appendChild(numberToMahjongTile(tile));
+                        });
+                        combinationDiv.innerHTML += ' | ';
+                    });
+                    // 牌型
+                    let huTypeSpan = document.createElement('span');
+                    huTypeSpan.className = 'hu-type'; // 应用CSS类
+                    huTypeSpan.innerText = ` ${combo['牌型']} `;
+                    combinationDiv.appendChild(huTypeSpan);
+
+                    // 分数
+                    let scoreSpan = document.createElement('span');
+                    scoreSpan.className = 'score'; // 应用CSS类
+                    scoreSpan.innerText = ` ${combo['分数']}分 `;
+                    combinationDiv.appendChild(scoreSpan);
+
+                    // 剩余张数
+                    let remainingSpan = document.createElement('span');
+                    remainingSpan.className = 'remaining'; // 应用CSS类，即使可能会被覆盖
+                    remainingSpan.innerText = `剩${combo['剩余张数']}张`;
+                    if (combo['剩余张数'] === 0) {
+                        remainingSpan.style.color = "red"; // 这会覆盖CSS类中的颜色设置
+                    }
+                    combinationDiv.appendChild(remainingSpan);
+
+                    if (index < data.combinations.length - 1) { // 如果不是最后一项，则添加横杠分隔
+                        let separator = document.createElement('hr');
+                        separator.style.margin = '10px 0';
+                        separator.style.color = '#EEECD1';
+                        resultDiv.appendChild(combinationDiv); // 先添加当前的胡牌明细
+                        resultDiv.appendChild(separator); // 然后添加横杠分隔符
+                    } else {
+                        resultDiv.appendChild(combinationDiv); // 如果是最后一项，直接添加胡牌明细，不添加横杠
+                    }
+                });
+            }
+            updateCounter();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('possibleHuResults').innerText = '请求失败: ' + error;
+        });
+    }
+
+    document.querySelector('.switch-box').addEventListener('change', function() {
+        let resultDiv = document.getElementById('result');
+        if (this.checked) {
+            resultDiv.style.display = 'block';
+        } else {
+            resultDiv.style.display = 'none';
+        }
+    });
+
+    function toggleResultsDisplay(show) {
+        let resultDiv = document.getElementById('result');
+        let toggleResultsText = document.getElementById('toggleResultsText');
+        resultDiv.style.display = show ? 'block' : 'none';
+    }
+
+    document.querySelector('.switch-box').addEventListener('change', function() {
+        isResultsShown = this.checked; // 更新展示状态
+        toggleResultsDisplay(isResultsShown);
+    });
+
+    const tileTypes = ['w', 'b', 't'];
+    const tileCounts = [9, 9, 9]; // 万，筒，条的数量
+    const tilesDiv = document.getElementById('tiles');
+    tileTypes.forEach((type, index) => {
+        let rowDiv = document.createElement('div');
+        rowDiv.className = 'tile-row';
+        for (let i = 1; i <= 9; i++) {
+            let tileValue = `${type}${i}`;
+            let imgPath = `/static/${type === 'w' ? 'wan' : type === 'b' ? 'tong' : 'tiao'}/${type === 'w' ? i : type === 'b' ? 10 + i : 20 + i}.png`;
+            let imgElement = `<img src="${imgPath}" alt="Tile ${tileValue}" class="mahjong-tile-upper" onclick="addTile('${tileValue}')">`;
+            rowDiv.innerHTML += imgElement;
+        }
+        tilesDiv.appendChild(rowDiv);
+    });
+
+    document.getElementById('resetButton').addEventListener('click', function() {
+        window.location.reload(); // 刷新页面
+    });
+    </script>
+</body>
+</html>
