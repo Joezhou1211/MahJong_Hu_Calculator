@@ -1,4 +1,68 @@
-# 川麻听牌计算器
+# Sichuan Mahjong Tenpai Calculator (English)
+
+This calculator can compute the specific tenpai (ready hand) and remaining tiles in Sichuan Mahjong.
+
+## Features
+
+- **Tenpai Calculation**: Calculates tenpai, remaining tiles, and scores.
+- **Customizable**: Can be modified to handle the complete logic of Guangdong Mahjong or Sichuan Mahjong.
+- **Extendable**: Can integrate image processing and machine learning to recognize tiles in images and provide optimal discard suggestions.
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Joezhou1211/MahJong_Hu_Calculator.git
+
+
+## Deployment and Access
+- Run the main.py file on your server.
+- Access the application via http://host_ip:7001.
+
+<img src="https://github.com/Joezhou1211/MahJong_Hu_Calculator/assets/121386280/37b0d2bb-10f2-42c0-b666-711c702e4335" width="330">
+<img src="https://github.com/Joezhou1211/MahJong_Hu_Calculator/assets/121386280/c41ade75-4045-4275-bbb8-6e75db2a407b" width="330">
+<img src="https://github.com/Joezhou1211/MahJong_Hu_Calculator/assets/121386280/b7912ef4-d77e-4bbf-bb6b-d9fb209b8b5d" width="330">
+
+## Custom Modification Suggestions
+
+### Mahjong Tile Definition
+To adapt the algorithm for the complete logic of Guangdong Mahjong or Sichuan Mahjong, redefine the tiles as follows:
+- **Characters (萬子)**: 1-9
+- **Bamboo (索子)**: 11-19
+- **Dots (筒子)**: 21-29
+- **Wind Tiles (風牌)**: 31 (East 東), 33 (South 南), 35 (West 西), 37 (North 北)
+- **Dragon Tiles (箭牌)**: 39 (Red Dragon 中), 41 (Green Dragon 發), 43 (White Dragon 白)
+- **Flower Tiles (花牌)**: Add logic as needed, depending on game rules.
+
+### Key Functions to Modify
+1. **find_hu_combinations_for_each_possible_hu**:
+   - Adjust the scoring system to align with specific game rules.
+   - Restrict the scope for special hands, such as "Pure Suit" (清一色).
+
+2. **check_hu** and **find_possible_hu**:
+   - Modify these functions to work with the newly defined tile sets (Characters, Bamboo, Dots).
+   - Ensure compatibility with the tile combinations specific to Guangdong or Sichuan Mahjong.
+
+3. **combinations_data**:
+   - Adapt the data structure to accommodate the new tile definitions.
+   - Make sure it aligns with the modified game logic and scoring rules.
+
+### Additional Enhancement Features
+
+- **Image Processing**:
+  - Integrate a machine learning model to recognize Mahjong tiles from images.
+  - Enhance the algorithm to accurately track the remaining tiles and provide the best possible discard suggestions.
+
+- **AI-Based Recommendations**:
+  - Consider implementing AI-driven decision-making to analyze the current hand and recommend optimal plays.
+  - Use reinforcement learning models trained on large datasets of Mahjong games to improve the accuracy of recommendations.
+
+
+
+
+
+
+# 川麻听牌计算器 (Chinese)
 
 本计算器可以计算四川麻将中的具体听牌和剩余张数
 
@@ -20,7 +84,6 @@
 <img src="https://github.com/Joezhou1211/MahJong_Hu_Calculator/assets/121386280/37b0d2bb-10f2-42c0-b666-711c702e4335" width="330">
 <img src="https://github.com/Joezhou1211/MahJong_Hu_Calculator/assets/121386280/c41ade75-4045-4275-bbb8-6e75db2a407b" width="330">
 <img src="https://github.com/Joezhou1211/MahJong_Hu_Calculator/assets/121386280/b7912ef4-d77e-4bbf-bb6b-d9fb209b8b5d" width="330">
-
 
 
 # 自定义修改建议
